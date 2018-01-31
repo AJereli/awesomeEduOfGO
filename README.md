@@ -1,0 +1,1 @@
+# Education go project (hell)
