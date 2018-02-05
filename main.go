@@ -1,10 +1,11 @@
 package main
 
 import (
-
+	"SC"
 )
 
 func main(){
-	server := makeServer("server1")
+
+	server := SC.MakeServer("server1")
 	server.Listen()
 }
