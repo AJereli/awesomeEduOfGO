@@ -41,8 +41,8 @@ func countSumOfTwoRepresentations2(n int, l int, r int) int {
 }
 
 
-func main (){
-
-	fmt.Println(countSumOfTwoRepresentations2(6,2,4))
-
-}
+//func main (){
+//
+//	fmt.Println(countSumOfTwoRepresentations2(6,2,4))
+//
+//}
