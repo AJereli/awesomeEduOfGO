@@ -1,0 +1,92 @@
+GET http://localhost:8080
+
+###
+
+POST http://localhost:8080
+
+###
+
+POST http://localhost:8080
+
+###
+
+POST http://localhost:8080/TodoShow?userid=test&password=pass
+Content-Type:: application/json
+
+{"userid":"test", "password":"paasdss"}
+
+###
+
+POST http://localhost:8080/login?userid=test&password=pass
+Content-Type:: application/json
+
+{"userid":"test", "password":"paasdss"}
+
+###
+
+GET http://localhost:8080/login?userid=test&password=pass
+Content-Type:: application/json
+
+###
+
+POST http://localhost:8080/login?userid=test&password=pass
+Content-Type:: application/json
+
+{"userid":"test", "password":"paasdss"}
+
+###
+
+POST http://localhost:8080/login
+Content-Type: : application/json
+
+{"userid":"test", "password":"paasdss"}
+
+###
+
+POST http://localhost:8080/login
+Content-Type:: application/json
+
+{"userid":"test", "password":"paasdss"}
+
+###
+
+POST http://localhost:8080/login
+Accept: */*
+Cache-Control: no-cache
+
+{"userid":"test", "password":"paasdss"}
+
+###
+
+POST http://localhost:8080/login
+Accept: */*
+Cache-Control: no-cache
+
+sdfdsf
+
+###
+
+POST http://localhost:8080/login?userid=test&password=pass
+Accept: */*
+Cache-Control: no-cache
+
+###
+
+POST http://localhost:8080/todo?userid=test&password=pass
+Accept: */*
+Cache-Control: no-cache
+
+###
+
+POST http://localhost:8080/login?userid=test&password=pass
+Accept: */*
+Cache-Control: no-cache
+
+###
+
+POST http://localhost:8080/resources?userid=test&password=pass
+Accept: */*
+Cache-Control: no-cache
+
+###
+

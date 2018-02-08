@@ -40,6 +40,14 @@ var routes = Routes{
 		"/todos",
 		TodoCreate,
 	},
+
+	Route{
+		"LogIn",
+		"POST",
+		"/login",
+		Login,
+	},
+
 }
 
 func WraperLogger(inner http.Handler, name string) http.Handler {
