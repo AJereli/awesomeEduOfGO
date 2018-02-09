@@ -7,3 +7,14 @@
  */
 
 package main
+
+import "reflect"
+
+func KeysFromMap(targetMap *map[string]reflect.Value) []string{
+
+	keys := make([]string, 0, len(*targetMap))
+	for k := range *targetMap {
+		keys = append(keys, k)
+	}
+	return keys
+}

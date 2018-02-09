@@ -7,3 +7,28 @@
  */
 
 package main
+
+import "fmt"
+
+const (
+	DBAddress = "localhost:3306"
+)
+
+var (
+	DBForGoInfo = DBInfo{
+		Login: "root",
+		Pass: "root",
+		DBName: "DBForGO",
+	}
+)
+
+type DBInfo struct {
+	Login, Pass, DBName string
+
+}
+
+
+func (dbInfo  DBInfo) GetDataSourceName () string{
+
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", dbInfo.Login, dbInfo.Pass,DBAddress,dbInfo.DBName)
+}

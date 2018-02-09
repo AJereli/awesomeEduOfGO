@@ -1,13 +1,77 @@
 package main
 
 import (
+	"awesomeProject/Auth"
+
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
+	"database/sql"
 	"io"
 	"io/ioutil"
 	"net/http"
+	_ "reflect"
+	_ "log"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
+
 )
+
+func Registration (w http.ResponseWriter, r * http.Request){
+	//var regInfo Auth.RegistrationInfo
+
+	params := r.URL.Query()
+
+	if !checkParams(params){
+		wrongParamsApiErr.send(w)
+		return
+	}
+
+	uID, userPass := params["userid"][0], params["password"][0]
+
+	db, err := sql.Open("mysql", DBForGoInfo.GetDataSourceName())
+	checkErr(err)
+
+	err = db.Ping()
+	checkErr(err)
+
+	var userExists bool
+	db.QueryRow(fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM users WHERE userid = '%s')	", uID)).Scan(&userExists)
+
+	if userExists{
+		notExistUserName.send(w)
+		return
+	}
+
+	accessToken := Auth.CreateToken(uID)
+
+	stmt, err := db.Prepare("INSERT users SET userid=?, password=?, access_token=?")
+	checkErr(err)
+
+	res, err := stmt.Exec(uID, userPass, accessToken)
+	checkErr(err)
+
+	fmt.Println(res)
+
+	jsonToken := Auth.JSONToken{AccessToken: accessToken}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(jsonToken); err != nil {
+		panic(err)
+	}
+}
+
+func QueryTest (w http.ResponseWriter, r * http.Request){
+	url := r.URL
+	params := url.Query()
+
+	for k,v := range params{
+		fmt.Fprintln(w, "Your param (k v): ", k, v)
+	}
+
+}
+
 
 func Login (w http.ResponseWriter, r * http.Request){
 	var user User
@@ -38,7 +102,7 @@ func Login (w http.ResponseWriter, r * http.Request){
 
 	for _, u := range testUsers{
 		if u.UserID == user.UserID && u.Password == user.Password{
-			accessToken := CreateToken(user.UserID)
+			accessToken := Auth.CreateToken(user.UserID)
 			loginInfo := LoginInfo{AccessToken:accessToken}
 
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")

@@ -47,7 +47,18 @@ var routes = Routes{
 		"/login",
 		Login,
 	},
-
+	Route{
+		"QueryTest",
+		"GET",
+		"/querytest",
+		QueryTest,
+	},
+	Route{
+		"Registration",
+		"GET",
+		"/registration",
+		Registration,
+	},
 }
 
 func WraperLogger(inner http.Handler, name string) http.Handler {
