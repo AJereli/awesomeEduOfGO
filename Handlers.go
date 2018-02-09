@@ -2,6 +2,7 @@ package main
 
 import (
 	"awesomeProject/Auth"
+	"awesomeProject/Trash"
 
 	"encoding/json"
 	"fmt"
@@ -13,7 +14,7 @@ import (
 	_ "log"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
+	_"github.com/gorilla/mux"
 
 )
 
@@ -100,48 +101,33 @@ func Login (w http.ResponseWriter, r * http.Request){
 	fmt.Println(user.UserID)
 
 
-	for _, u := range testUsers{
-		if u.UserID == user.UserID && u.Password == user.Password{
-			accessToken := Auth.CreateToken(user.UserID)
-			loginInfo := LoginInfo{AccessToken:accessToken}
-
-			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-			w.WriteHeader(http.StatusCreated)
-			if err := json.NewEncoder(w).Encode(loginInfo); err != nil {
-				panic(err)
-			}
-			return
-		}
+	//for _, u := range testUsers{
+	//	if u.UserID == user.UserID && u.Password == user.Password{
+	//		accessToken := Auth.CreateToken(user.UserID)
+	//		loginInfo := LoginInfo{AccessToken:accessToken}
+	//
+	//		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	//		w.WriteHeader(http.StatusCreated)
+	//		if err := json.NewEncoder(w).Encode(loginInfo); err != nil {
+	//			panic(err)
+	//		}
+	//		return
+	//	}
+	//}
+	//
+	//apiErr := ApiError{ErrorCode: 403, Message:"Unautorizated\nWrong login or password :(\n"}
+	//apiErr.send(w)
 	}
 
-	apiErr := ApiError{ErrorCode: 403, Message:"Unautorizated\nWrong login or password :(\n"}
-	apiErr.send(w)
-	}
 
-
-func Index(w http.ResponseWriter, r *http.Request) {
+func welcome(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Welcome!")
 }
 
 
 
-func TodoIndex(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(todos); err != nil {
-		panic(err)
-	}
-
-}
-func TodoShow(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	todoId := vars["todoId"]
-
-	fmt.Fprintln(w, "Todo show:", todoId)
-}
 func TodoCreate(w http.ResponseWriter, r *http.Request) {
-	var todo Todo
+	var todo Trash.Todo
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -158,7 +144,7 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(string(body))
 	fmt.Println(todo)
-	t := RepoCreateTodo(todo)
+	t := Trash.RepoCreateTodo(todo)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(t); err != nil {

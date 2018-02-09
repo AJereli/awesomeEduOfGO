@@ -8,24 +8,12 @@
 
 package main
 
-import (
-	"log"
-	"net/http"
-	"time"
-)
+type User struct {
 
-func WraperLogger(inner http.Handler, name string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-
-		inner.ServeHTTP(w, r)
-
-		log.Printf(
-			"%s\t%s\t%s\t%s",
-			r.Method,
-			r.RequestURI,
-			name,
-			time.Since(start),
-		)
-	})
+	UserID string `json:"userid"`
+	Password string `json:"password"`
+	Email string `json:"email"`
 }
+
+
+

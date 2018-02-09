@@ -1,9 +1,7 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -17,22 +15,10 @@ type Routes []Route
 
 var routes = Routes{
 	Route{
-		"Index",
+		"Welcom",
 		"GET",
 		"/",
-		Index,
-	},
-	Route{
-		"TodoIndex",
-		"GET",
-		"/todos",
-		TodoIndex,
-	},
-	Route{
-		"TodoShow",
-		"GET",
-		"/todos/{todoId}",
-		TodoShow,
+		welcome,
 	},
 	Route{
 		"TodoCreate",
@@ -61,21 +47,6 @@ var routes = Routes{
 	},
 }
 
-func WraperLogger(inner http.Handler, name string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-
-		inner.ServeHTTP(w, r)
-
-		log.Printf(
-			"%s\t%s\t%s\t%s",
-			r.Method,
-			r.RequestURI,
-			name,
-			time.Since(start),
-		)
-	})
-}
 
 func InitRouter () *mux.Router{
 	router := mux.NewRouter().StrictSlash(true)
