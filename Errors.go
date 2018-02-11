@@ -14,16 +14,18 @@ import (
 
 /// API error codes
 const (
-	wrongRegParms = 100
+	wrongRegParmsCode = 100
 	wrongParams = "Wrong params"
 
-	userNameNotExists = 101
+	userNameNotExistsCode = 101
 
+	loginErrCode = 102
 )
 
 var (
-	wrongParamsApiErr = ApiError{wrongRegParms, wrongParams}
-	notExistUserName = ApiError{userNameNotExists, "Sorry, this user name not available"}
+	wrongParamsApiErr = ApiError{wrongRegParmsCode, wrongParams}
+	notExistUserName = ApiError{userNameNotExistsCode, "Sorry, this user name not available"}
+	loginApiErr = ApiError{loginErrCode, "Wrong login or password"}
 )
 
 type ApiError struct {

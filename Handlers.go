@@ -1,9 +1,8 @@
 package main
 
 import (
-	"awesomeProject/Auth"
-	"awesomeProject/Trash"
-
+	"./Auth"
+	"./Trash"
 	"encoding/json"
 	"fmt"
 	"database/sql"
@@ -41,6 +40,7 @@ func Registration (w http.ResponseWriter, r * http.Request){
 
 	if userExists{
 		notExistUserName.send(w)
+		db.Close()
 		return
 	}
 
@@ -53,6 +53,8 @@ func Registration (w http.ResponseWriter, r * http.Request){
 	checkErr(err)
 
 	fmt.Println(res)
+
+	db.Close()
 
 	jsonToken := Auth.JSONToken{AccessToken: accessToken}
 
@@ -100,23 +102,22 @@ func Login (w http.ResponseWriter, r * http.Request){
 	}
 	fmt.Println(user.UserID)
 
+	var truePassword string
 
-	//for _, u := range testUsers{
-	//	if u.UserID == user.UserID && u.Password == user.Password{
-	//		accessToken := Auth.CreateToken(user.UserID)
-	//		loginInfo := LoginInfo{AccessToken:accessToken}
-	//
-	//		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	//		w.WriteHeader(http.StatusCreated)
-	//		if err := json.NewEncoder(w).Encode(loginInfo); err != nil {
-	//			panic(err)
-	//		}
-	//		return
-	//	}
-	//}
-	//
-	//apiErr := ApiError{ErrorCode: 403, Message:"Unautorizated\nWrong login or password :(\n"}
-	//apiErr.send(w)
+	db, err := sql.Open("mysql", DBForGoInfo.GetDataSourceName())
+
+
+	//TODO get pass and token
+	db.QueryRow(fmt.Sprintf("SELECT password FROM users WHERE userid = '%s')	", user.UserID)).Scan(&truePassword)
+
+	db.Close()
+
+	if user.Password == truePassword{
+		//TODO send ACCESS TOKEN
+	} else {
+		loginApiErr.send(w)
+	}
+
 	}
 
 

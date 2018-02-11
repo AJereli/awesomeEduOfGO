@@ -9,8 +9,6 @@ import (
 )
 
 
-
-
 func main() {
 	fmt.Println("apiTry.main")
 
