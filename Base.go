@@ -9,10 +9,30 @@
 package main
 
 import (
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
 )
+
+const(
+	LimitJSONRead = 1048576
+)
+
+func ReadRequestBody (r * http.Request) []byte {
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, LimitJSONRead))
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+	return body
+}
+
 
 func WraperLogger(inner http.Handler, name string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

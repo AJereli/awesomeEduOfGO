@@ -29,7 +29,7 @@ var routes = Routes{
 
 	Route{
 		"LogIn",
-		"POST",
+		"GET",
 		"/login",
 		Login,
 	},
@@ -44,6 +44,18 @@ var routes = Routes{
 		"GET",
 		"/registration",
 		Registration,
+	},
+	Route{
+		"SendMessage",
+		"POST",
+		"/massage/send",
+		SendMassage,
+	},
+	Route{
+		"GetMassagesToUser",
+		"GET",
+		"/massage/getmassagestouser",
+		GetMassagesToUser,
 	},
 }
 

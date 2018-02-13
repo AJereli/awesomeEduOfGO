@@ -20,12 +20,17 @@ const (
 	userNameNotExistsCode = 101
 
 	loginErrCode = 102
+
+
+	tokenTimeOutCode = 160
 )
 
 var (
-	wrongParamsApiErr = ApiError{wrongRegParmsCode, wrongParams}
-	notExistUserName = ApiError{userNameNotExistsCode, "Sorry, this user name not available"}
-	loginApiErr = ApiError{loginErrCode, "Wrong login or password"}
+	wrongParamsApiErr      = ApiError{wrongRegParmsCode, wrongParams}
+	notExistUserNameApiErr = ApiError{userNameNotExistsCode, "Sorry, this user name is not available"}
+	loginApiErr            = ApiError{loginErrCode, "Wrong login or password"}
+
+	tokenTimeOutApiErr	   = ApiError{tokenTimeOutCode, "Access token time out"}
 )
 
 type ApiError struct {

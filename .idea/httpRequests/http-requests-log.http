@@ -1,3 +1,31 @@
+POST http://localhost:8080/login?userid=rocxzvcxbcbvb2ot&password=1234dasdasdasd
+
+###
+
+POST http://localhost:8080/login?userid=rocxzvcxbcbvb2ot&password=1234dasdasdasd
+
+###
+
+GET http://localhost:8080/welcome?userid=rocxzvcxbcbvb2ot&password=1234dasdasdasd
+
+###
+
+GET http://localhost:8080/welcome?userid=rocxzvcxbcbvb2ot&password=1234dasdasdasd
+
+###
+
+POST http://localhost:8080/registration?userid=rocxzvcxbcbvb2ot&password=1234dasdasdasd
+
+###
+
+POST http://localhost:8080/registration?userid=rocxzvcxbcbvb2ot&password=1234dasdasdasd
+
+###
+
+GET http://localhost:8080/login
+
+###
+
 GET http://localhost:8080
 
 ###

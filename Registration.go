@@ -9,7 +9,8 @@
 package main
 
 import (
-	"fmt"
+	_"fmt"
+	"log"
 	"net/url"
 	"reflect"
 )
@@ -22,7 +23,7 @@ type RegistrationInfo struct {
 func checkParams (params url.Values) bool{
 	isOk := true
 	if len(params) != 2 {
-		isOk = false
+		return false
 
 	}
 
@@ -36,7 +37,7 @@ func checkParams (params url.Values) bool{
 
 	if !isOk{
 		//TODO some bug, false when params is normal
-		fmt.Println("what???")
+		log.Println("what???")
 	}
 
 	return isOk

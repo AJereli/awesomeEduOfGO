@@ -23,8 +23,17 @@ const (
 type TokenInfo struct {
 	UserId string `json:"userid"`
 	ISS string `json:"iss"`
+	ExpTime float64 `json:"exp"`
+	Nbf float64 `json:"nbf"`
 }
 
+
+func (token TokenInfo) CheckExpTime ()bool {
+	if time.Now().Unix() >= int64(token.ExpTime) {
+		return false
+	}
+	return true
+}
 
 
 type JSONToken struct{
@@ -56,7 +65,7 @@ func ParseToken (tokenString string)  TokenInfo{
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return TokenInfo {ISS: claims["iss"].(string), UserId: claims["userId"].(string)}
+		return TokenInfo {ISS: claims["iss"].(string), UserId: claims["userId"].(string), ExpTime: claims["exp"].(float64), Nbf:claims["nbf"].(float64)}
 	} else {
 		panic(err)
 	}
