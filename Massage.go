@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	_"fmt"
-	"log"
+	_"log"
 	"net/http"
 	"time"
 )
@@ -15,6 +15,25 @@ type Massage struct {
 	Reciver string `json:"reciver"`
 	SendDate string `json:"send_date"`
 	Body string `json:"body"`
+}
+
+func (msg * Massage) PopulateFromRow(rows *sql.Rows, senderId string, reciverId string) {
+
+	err := rows.Scan(&msg.Body, &msg.SendDate)
+	checkErr(err)
+	msg.Reciver = reciverId
+	msg.Sender = senderId
+}
+
+func GetMassageFromRows(rows * sql.Rows, senderId string, reciverId string) []Massage{
+	var msgs []Massage
+
+	for rows.Next(){
+		var msg Massage
+		msg.PopulateFromRow(rows, senderId, reciverId)
+		msgs = append(msgs, msg)
+	}
+	return msgs
 }
 
 func SendMassage (w http.ResponseWriter, r * http.Request){
@@ -29,16 +48,11 @@ func SendMassage (w http.ResponseWriter, r * http.Request){
 	body := ReadRequestBody(r)
 
 	if err := json.Unmarshal(body, &msgInfo); err != nil {
-		log.Println(err)
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
+		unprocessableEntityApiErr.send(w)
 	}
 	token := Auth.ParseToken(msgInfo.Access_token)
 
-	if token.CheckExpTime() {
+	if !token.CheckExpTime() {
 		tokenTimeOutApiErr.send(w)
 		return
 	}
@@ -61,26 +75,18 @@ func SendMassage (w http.ResponseWriter, r * http.Request){
 }
 
 
-func GetMassagesToUser (w http.ResponseWriter, r * http.Request){
-
+func GetMassagesFromUser (w http.ResponseWriter, r* http.Request){
 	type RequestParams struct {
 		AccessToken string `json:"access_token"`
-		ReciverUser string `json:"reciver_id"`
-
+		SenderUser string `json:"sender_id"`
 	}
 
 	var reqParams RequestParams
 
-	body := ReadRequestBody(r)
-
-	if err := json.Unmarshal(body, &reqParams); err != nil {
-		log.Println(err)
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
+	if UnmarshalRequest(r, &reqParams) != nil{
+		unprocessableEntityApiErr.send(w)
 	}
+
 	token := Auth.ParseToken(reqParams.AccessToken)
 
 	if !token.CheckExpTime() {
@@ -94,21 +100,57 @@ func GetMassagesToUser (w http.ResponseWriter, r * http.Request){
 	err = db.Ping()
 	checkErr(err)
 
-	rows, err := db.Query("SELECT massage_body, create_date FROM massage WHERE creator_id = ? AND id IN (SELECT message_id FROM DBForGO.messange_reciver WHERE reciver_id = ?)", token.UserId, reqParams.ReciverUser)
+	rows, err := db.Query("SELECT massage_body, create_date FROM massage WHERE creator_id = ? AND " +
+		"id IN (SELECT message_id FROM DBForGO.messange_reciver WHERE reciver_id = ?)", reqParams.SenderUser, token.UserId)
+	checkErr(err)
+
+
+
+
+	msgs := GetMassageFromRows(rows, reqParams.SenderUser, token.UserId)
 	defer rows.Close()
-	var msgs []Massage
-	for rows.Next(){
-		var msg Massage
-		err = rows.Scan(&msg.Body, &msg.SendDate)
-		msg.Reciver = reqParams.ReciverUser
-		msg.Sender = token.UserId
-		msgs = append(msgs, msg)
+
+	SendJson(w, msgs)
+
+}
+
+func GetMassagesToUser (w http.ResponseWriter, r * http.Request){
+	type RequestParams struct{
+		AccessToken string `json:"access_token"`
+		ReciverUser string `json:"reciver_id"`
 
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(msgs); err != nil {
-		panic(err)
+
+	var reqParams RequestParams
+
+	if UnmarshalRequest(r, &reqParams) != nil{
+		unprocessableEntityApiErr.send(w)
 	}
+
+	token := Auth.ParseToken(reqParams.AccessToken)
+
+	if !token.CheckExpTime() {
+		tokenTimeOutApiErr.send(w)
+		return
+	}
+
+	db, err := sql.Open("mysql", DBForGoInfo.GetDataSourceName())
+	defer db.Close()
+	checkErr(err)
+	err = db.Ping()
+	checkErr(err)
+
+	rows, err := db.Query("SELECT massage_body, create_date FROM massage WHERE creator_id = ? AND " +
+		"id IN (SELECT message_id FROM DBForGO.messange_reciver WHERE reciver_id = ?)", token.UserId, reqParams.ReciverUser)
+	checkErr(err)
+
+
+	defer rows.Close()
+
+	msgs := GetMassageFromRows(rows, token.UserId, reqParams.ReciverUser)
+
+
+	SendJson(w, msgs)
+
 
 }

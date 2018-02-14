@@ -9,6 +9,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,6 +20,14 @@ import (
 const(
 	LimitJSONRead = 1048576
 )
+
+func SendJson (w http.ResponseWriter, v interface{}){
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		panic(err)
+	}
+}
 
 func ReadRequestBody (r * http.Request) []byte {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, LimitJSONRead))
@@ -31,6 +40,12 @@ func ReadRequestBody (r * http.Request) []byte {
 		panic(err)
 	}
 	return body
+}
+
+
+func UnmarshalRequest (r * http.Request, v interface{}) error {
+	body := ReadRequestBody(r)
+	return json.Unmarshal(body, &v)
 }
 
 

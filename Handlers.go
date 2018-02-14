@@ -8,7 +8,7 @@ import (
 	"database/sql"
 	"io"
 	"io/ioutil"
-	"log"
+	_"log"
 	"net/http"
 	_ "reflect"
 	_ "log"
@@ -64,11 +64,7 @@ func Registration (w http.ResponseWriter, r * http.Request){
 	jsonToken := Auth.JSONToken{AccessToken: accessToken}
 
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(jsonToken); err != nil {
-		panic(err)
-	}
+	SendJson(w, jsonToken)
 }
 
 func QueryTest (w http.ResponseWriter, r * http.Request){
@@ -97,12 +93,7 @@ func Login (w http.ResponseWriter, r * http.Request){
 
 
 	if err := json.Unmarshal(body, &user); err != nil {
-		log.Println(err)
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
+		unprocessableEntityApiErr.send(w)
 	}
 
 	var truePassword, trueToken string
@@ -110,19 +101,15 @@ func Login (w http.ResponseWriter, r * http.Request){
 	db, err := sql.Open("mysql", DBForGoInfo.GetDataSourceName())
 	checkErr(err)
 
-	db.QueryRow("SELECT password, access_token FROM users WHERE userid = ?", user.UserID).Scan(&truePassword, &trueToken)
+	db.QueryRow("SELECT password FROM users WHERE userid = ?", user.UserID).Scan(&truePassword)
 	defer db.Close()
 
 	fmt.Println("Passw: 	", truePassword, "\ntoken: ", trueToken)
 
-
 	if user.Password == truePassword{
-
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusCreated)
-		if err := json.NewEncoder(w).Encode(Auth.JSONToken{AccessToken: trueToken}); err != nil {
-			panic(err)
-		}
+		trueToken = Auth.CreateToken(user.UserID)
+		SendJson(w, Auth.JSONToken{AccessToken: trueToken})
+		db.Query("UPDATE users SET access_token = ? WHERE userid = ?", trueToken, user.UserID)
 	} else {
 		loginApiErr.send(w)
 	}
@@ -146,11 +133,7 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if err := json.Unmarshal(body, &todo); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
+		unprocessableEntityApiErr.send(w)
 	}
 	fmt.Println(string(body))
 	fmt.Println(todo)

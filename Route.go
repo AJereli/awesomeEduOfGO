@@ -57,6 +57,12 @@ var routes = Routes{
 		"/massage/getmassagestouser",
 		GetMassagesToUser,
 	},
+	Route{
+		"GetMassagesFromUser",
+		"GET",
+		"/massage/getmassagesfromuser",
+		GetMassagesFromUser,
+	},
 }
 
 
