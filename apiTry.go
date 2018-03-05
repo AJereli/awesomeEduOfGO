@@ -2,21 +2,41 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"time"
 
-	"log"
+	"github.com/op/go-logging"
+
 	"net/http"
 
 )
+var format = logging.MustStringFormatter(
+	`%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`,
+)
 
+var GlogFormatter = logging.MustStringFormatter("%{level:.1s}%{time:0102 15:04:05.999999} %{pid} %{shortfile}] %{message}")
 
-
+var log = logging.MustGetLogger("Global Logger")
 
 func main() {
-	fmt.Println("Server start\nPress Ctrl+C to shutdown")
+	backend1 := logging.NewLogBackend(os.Stderr, "", 0)
+	backend2 := logging.NewLogBackend(os.Stderr, "", 0)
+
+	// For messages written to backend2 we want to add some additional
+	// information to the output, including the used log level and the name of
+	// the function.
+	backend2Formatter := logging.NewBackendFormatter(backend2, format)
+
+	// Only errors and more severe messages should be sent to backend1
+	backend1Leveled := logging.AddModuleLevel(backend1)
+	backend1Leveled.SetLevel(logging.ERROR, "")
+
+	// Set the backends to be used.
+	logging.SetBackend(backend1Leveled, backend2Formatter)
+
+
+	log.Notice("Server start\nPress Ctrl+C to shutdown")
 	router := InitRouter()
 	srv := &http.Server{
 		Handler:      router,
@@ -28,7 +48,7 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			log.Println(err)
+			log.Info(err)
 		}
 	}()
 
@@ -46,7 +66,7 @@ func main() {
 
 	srv.Shutdown(ctx)
 
-	log.Println("shutting down")
+	log.Notice("shutting down")
 	os.Exit(0)
 
 }

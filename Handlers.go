@@ -40,10 +40,10 @@ func Registration (w http.ResponseWriter, r * http.Request){
 	err = db.Ping()
 	checkErr(err)
 
-	var userNameExists bool
-	db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE userid = ?)", uID).Scan(&userNameExists)
+	var userNameIsExists bool
+	db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE userid = ?)", uID).Scan(&userNameIsExists)
 
-	if userNameExists {
+	if userNameIsExists {
 		notExistUserNameApiErr.send(w)
 		db.Close()
 		return
@@ -62,7 +62,6 @@ func Registration (w http.ResponseWriter, r * http.Request){
 	db.Close()
 
 	jsonToken := Auth.JSONToken{AccessToken: accessToken}
-
 
 	SendJson(w, jsonToken)
 }
@@ -103,8 +102,6 @@ func Login (w http.ResponseWriter, r * http.Request){
 
 	db.QueryRow("SELECT password FROM users WHERE userid = ?", user.UserID).Scan(&truePassword)
 	defer db.Close()
-
-	fmt.Println("Passw: 	", truePassword, "\ntoken: ", trueToken)
 
 	if user.Password == truePassword{
 		trueToken = Auth.CreateToken(user.UserID)

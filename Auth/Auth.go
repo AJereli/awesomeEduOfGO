@@ -11,6 +11,7 @@ package Auth
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/ethereum/go-ethereum/log"
 	"time"
 
 )
@@ -43,7 +44,8 @@ type JSONToken struct{
 var hmacSampleSecret = []byte("asdhguczx1412313214jifh")
 
 func CreateToken (userId string) string{
-	claims := jwt.MapClaims{"userId" : userId, "nbf": time.Now().Unix(), "exp":time.Now().Unix() + ExpiresTime,"iss": AppName}
+	tokenTime := time.Now().Unix() + ExpiresTime
+	claims := jwt.MapClaims{"userId" : userId, "nbf": time.Now().Unix(), "exp": tokenTime,"iss": AppName}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token.Claims.Valid()
 	toketString, err := token.SignedString(hmacSampleSecret)
@@ -55,7 +57,7 @@ func CreateToken (userId string) string{
 
 }
 
-func ParseToken (tokenString string)  TokenInfo{
+func ParseToken(tokenString string)  TokenInfo {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -64,14 +66,15 @@ func ParseToken (tokenString string)  TokenInfo{
 		return hmacSampleSecret, nil
 	})
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return TokenInfo {ISS: claims["iss"].(string), UserId: claims["userId"].(string), ExpTime: claims["exp"].(float64), Nbf:claims["nbf"].(float64)}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		tokenInfo := TokenInfo {ISS: claims["iss"].(string), UserId: claims["userId"].(string), ExpTime: claims["exp"].(float64), Nbf:claims["nbf"].(float64)}
+		return tokenInfo
 	} else {
+		log.Error(err.Error())
 		panic(err)
 	}
+
 }
-
-
 
 
 

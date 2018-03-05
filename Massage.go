@@ -38,9 +38,9 @@ func GetMassageFromRows(rows * sql.Rows, senderId string, reciverId string) []Ma
 
 func SendMassage (w http.ResponseWriter, r * http.Request){
 	type MassageInfo struct {
-		Access_token string `json:"access_token"`
-		Massage string `json:"massage"`
-		ReciverId string `json:"reciver_id"`
+		AccessToken string `json:"access_token"`
+		Massage     string `json:"massage"`
+		ReciverId   string `json:"reciver_id"`
 	}
 
 	var msgInfo MassageInfo
@@ -50,12 +50,12 @@ func SendMassage (w http.ResponseWriter, r * http.Request){
 	if err := json.Unmarshal(body, &msgInfo); err != nil {
 		unprocessableEntityApiErr.send(w)
 	}
-	token := Auth.ParseToken(msgInfo.Access_token)
-
-	if !token.CheckExpTime() {
-		tokenTimeOutApiErr.send(w)
-		return
-	}
+	token:= Auth.ParseToken(msgInfo.AccessToken)
+	//
+	//if !token.CheckExpTime() {
+	//	tokenTimeOutApiErr.send(w)
+	//	return
+	//}
 
 	db, err := sql.Open("mysql",  DBForGoInfo.GetDataSourceName())
 	checkErr(err)
@@ -87,12 +87,7 @@ func GetMassagesFromUser (w http.ResponseWriter, r* http.Request){
 		unprocessableEntityApiErr.send(w)
 	}
 
-	token := Auth.ParseToken(reqParams.AccessToken)
-
-	if !token.CheckExpTime() {
-		tokenTimeOutApiErr.send(w)
-		return
-	}
+	token:= Auth.ParseToken(reqParams.AccessToken)
 
 	db, err := sql.Open("mysql", DBForGoInfo.GetDataSourceName())
 	defer db.Close()
@@ -127,7 +122,7 @@ func GetMassagesToUser (w http.ResponseWriter, r * http.Request){
 		unprocessableEntityApiErr.send(w)
 	}
 
-	token := Auth.ParseToken(reqParams.AccessToken)
+	token:= Auth.ParseToken(reqParams.AccessToken)
 
 	if !token.CheckExpTime() {
 		tokenTimeOutApiErr.send(w)

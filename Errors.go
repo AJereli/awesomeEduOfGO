@@ -9,7 +9,7 @@
 package main
 import (
 	"encoding/json"
-	"log"
+
 	"net/http"
 )
 
@@ -46,11 +46,11 @@ type ApiError struct {
 }
 
 func (apiErr *ApiError) send (w http.ResponseWriter){
-	log.Println(apiErr.Message)
+	log.Info(apiErr.Message)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(apiErr); err != nil {
-		log.Println(err)
+		log.Error(err)
 		panic(err)
 	}
 }

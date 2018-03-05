@@ -10,7 +10,6 @@ package main
 
 import (
 	_"fmt"
-	"log"
 	"net/url"
 	"reflect"
 )
@@ -37,7 +36,7 @@ func checkParams (params url.Values) bool{
 
 	if !isOk{
 		//TODO some bug, false when params is normal
-		log.Println("what???")
+		log.Debug("what???")
 	}
 
 	return isOk

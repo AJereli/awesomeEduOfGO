@@ -12,9 +12,8 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
-	"net/http"
 	"time"
+	"net/http"
 )
 
 const(
@@ -55,7 +54,7 @@ func WraperLogger(inner http.Handler, name string) http.Handler {
 
 		inner.ServeHTTP(w, r)
 
-		log.Printf(
+		log.Info(
 			"%s\t%s\t%s\t%s",
 			r.Method,
 			r.RequestURI,
