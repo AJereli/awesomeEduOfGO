@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
-
 	"github.com/op/go-logging"
 
-	"net/http"
+
+	_"net/http"
 
 )
 var format = logging.MustStringFormatter(

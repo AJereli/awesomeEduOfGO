@@ -21,6 +21,18 @@ import (
 
 
 
+
+func QueryTest (w http.ResponseWriter, r * http.Request){
+	url := r.URL
+	params := url.Query()
+
+	for k,v := range params{
+		fmt.Fprintln(w, "Your param (k v): ", k, v)
+	}
+
+}
+
+
 func Registration (w http.ResponseWriter, r * http.Request){
 	//var regInfo Auth.RegistrationInfo
 
@@ -65,17 +77,6 @@ func Registration (w http.ResponseWriter, r * http.Request){
 
 	SendJson(w, jsonToken)
 }
-
-func QueryTest (w http.ResponseWriter, r * http.Request){
-	url := r.URL
-	params := url.Query()
-
-	for k,v := range params{
-		fmt.Fprintln(w, "Your param (k v): ", k, v)
-	}
-
-}
-
 
 func Login (w http.ResponseWriter, r * http.Request){
 	var user User
